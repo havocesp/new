@@ -153,11 +153,10 @@ class CPlugin(Plugin):
 
     def make_defines(self, definelst, defaults=None):
         """ Create #define lines, given a list of variables. """
-        defstr = '\n'.join(
+        if defstr := '\n'.join(
             template_define.format(define=s)
             for s in sorted(set((defaults or []) + definelst))
-        )
-        if defstr:
+        ):
             return '\n{}'.format(defstr)
         return defstr
 

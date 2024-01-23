@@ -86,8 +86,7 @@ def conflicting_file(plugin, filearg, filename):
 
     for plugintype in plugins:
         # If the filename arg matches a plugin module name we have a conflict.
-        conflict = plugins[plugintype].get(filearg, None)
-        if conflict:
+        if conflict := plugins[plugintype].get(filearg, None):
             break
         elif rootdir:
             conflict = plugins[plugintype].get(rootdir, None)
@@ -328,11 +327,10 @@ def create_custom_plugin(names, info):
             # Build actual format args to be used.
             formatargs = {}
             for tagname in formattags:
-                tagval = knowntags.get(
+                if (tagval := knowntags.get(
                     tagname,
                     pluginconfig.get(tagname, None)
-                )
-                if tagval is None:
+                )) is None:
                     self.debug('Unknown format tag: {}'.format(tagname))
                     if self.allow_bad_tags:
                         try:
@@ -365,8 +363,7 @@ def create_custom_plugin(names, info):
             """ Overloaded help() for custom plugins. """
             name = self.get_name()
             print('\nHelp for custom New plugin, {}:\n'.format(name))
-            desc = self.get_desc()
-            if desc:
+            if desc := self.get_desc():
                 print('Description:\n{}'.format(desc))
             else:
                 print('(no description available)')
@@ -555,8 +552,7 @@ def determine_plugin(argd, use_default=True):
         debug('No args after --, filename is: {}'.format(argd['FILENAME']))
         raise DocoptExit()
 
-    namedplugincls = get_plugin_byname(argd['FILENAME'], use_post=True)
-    if namedplugincls:
+    if namedplugincls := get_plugin_byname(argd['FILENAME'], use_post=True):
         # Plugin name was mistaken for a file name (ambiguous docopt usage).
         # Use default file name since no file name was given.
         argd['FILENAME'] = default_file
@@ -581,8 +577,7 @@ def determine_plugin(argd, use_default=True):
     # Fix args to assume filename was passed.
     argd['FILENAME'] = argd['PLUGIN'] or argd['FILENAME']
     argd['PLUGIN'] = None
-    extplugin = get_plugin_byext(argd['FILENAME'])
-    if extplugin:
+    if extplugin := get_plugin_byext(argd['FILENAME']):
         # Determined plugin by file extension.
         debug('Plugin determined by file name/extension.')
         return extplugin
@@ -592,8 +587,7 @@ def determine_plugin(argd, use_default=True):
 
     # Fall back to default plugin, or user specified.
     # Allow loading post-plugins by name when using --pluginconfig.
-    plugincls = get_plugin_byname(argd['PLUGIN'], use_post=True)
-    if plugincls:
+    if plugincls := get_plugin_byname(argd['PLUGIN'], use_post=True):
         debug('Plugin loaded by given name.')
         return plugincls
     return get_plugin_default() if use_default else None
@@ -617,8 +611,7 @@ def do_post_plugins(fname, plugin):
             debug(skipmsg.format(postcls.get_name(), plugin.get_name()))
             continue
 
-        pluginret = try_post_plugin(postcls, plugin, fname)
-        if pluginret == PluginReturn.fatal:
+        if (pluginret := try_post_plugin(postcls, plugin, fname)) == PluginReturn.fatal:
             return errors + 1
         errors += pluginret.value
 
@@ -642,8 +635,7 @@ def do_post_plugins(fname, plugin):
             skipmsg = 'Skipping deferred-plugin {} for {}.'
             debug(skipmsg.format(deferredcls.get_name(), plugin.get_name()))
             continue
-        pluginret = try_post_plugin(deferredcls, plugin, fname)
-        if pluginret == PluginReturn.fatal:
+        if (pluginret := try_post_plugin(deferredcls, plugin, fname)) == PluginReturn.fatal:
             return errors + 1
         errors += pluginret.value
 
@@ -1017,8 +1009,7 @@ def load_module_plugins(module):  # noqa
 
     for plugincls in module.exports:
         # debug('    checking {}'.format(plugin))
-        invalidreason = is_invalid_plugin(plugincls)
-        if invalidreason:
+        if invalidreason := is_invalid_plugin(plugincls):
             errmsg = 'Not a valid plugin {}: {}'
             debug(errmsg.format(plugincls.__name__, invalidreason))
             continue
@@ -1361,8 +1352,7 @@ class PluginBase(object):
         """ Loads default args from config, if any are set.
             Returns a list of args on success, or [] on failure.
         """
-        args = getattr(self, 'config', {}).get('default_args', [])
-        if args:
+        if args := getattr(self, 'config', {}).get('default_args', []):
             self.debug('Got default args: {}'.format(args))
         return args
 
@@ -1375,13 +1365,11 @@ class PluginBase(object):
         if cls.description:
             return cls.description
 
-        mainfunc = getattr(cls, 'create', getattr(cls, 'process', None))
-        if mainfunc is None:
+        if (mainfunc := getattr(cls, 'create', getattr(cls, 'process', None))) is None:
             cls.description = ''
             return cls.description
 
-        docs = mainfunc.__doc__
-        if docs:
+        if docs := mainfunc.__doc__:
             cls.description = docs.split('\n')[0].strip()
         else:
             cls.description = ''

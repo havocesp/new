@@ -136,11 +136,9 @@ class JQueryDownloadPost(PostPlugin):
         """ Return a dict of all jquery download urls in the form of:
             {version: download_url}
         """
-        htmldata = self.get_jquery_page()
-        if htmldata is None:
+        if (htmldata := self.get_jquery_page()) is None:
             return {}
-        htmlelem = html.fromstring(htmldata)
-        if htmlelem is None:
+        if (htmlelem := html.fromstring(htmldata)) is None:
             return {}
 
         linktext = 'minified' if minified else 'uncompressed'

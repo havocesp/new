@@ -138,11 +138,10 @@ class JQueryPlugin(Plugin):
         jsfiles = set(
             self.argd['--js'] or self.config.get('main_js', set())
         )
-        skipdl = (
+        if skipdl := (
             (self.argd['VERSION'] or '').lower() in {'no', 'none'} or
             self.config.get('no_download', False)
-        )
-        if skipdl:
+        ):
             self.debug('Skipping jquery download.')
             scripts = ''
             self.ignore_deferred.add('jquerydl')

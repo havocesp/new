@@ -257,8 +257,7 @@ def get_plugin(argd, use_default=True):
                            plugin on bad names/types.
                            Default: True
     """
-    plugincls = plugins.determine_plugin(argd, use_default=use_default)
-    if plugincls:
+    if plugincls := plugins.determine_plugin(argd, use_default=use_default):
         return plugincls()
 
     ftype = argd['PLUGIN'] or argd['FILENAME']
@@ -270,8 +269,7 @@ def get_plugin(argd, use_default=True):
         return None
 
     argd['PLUGIN'] = 'text'
-    plugincls = plugins.determine_plugin(argd)
-    if plugincls:
+    if plugincls := plugins.determine_plugin(argd):
         return plugincls()
 
     print_err('Unable to load the text plugin, sorry.')
