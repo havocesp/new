@@ -6,6 +6,7 @@ import os
 import subprocess
 
 from plugins import DeferredPostPlugin
+from security import safe_command
 
 
 class OpenPlugin(DeferredPostPlugin):
@@ -25,7 +26,7 @@ class OpenPlugin(DeferredPostPlugin):
         cmd = [editor]
         cmd.extend(filepaths)
         self.print_status('Opening with: {}'.format(' '.join(cmd)))
-        proc = subprocess.Popen(cmd)
+        proc = safe_command.run(subprocess.Popen, cmd)
         return proc
 
     def process(self, plugin, path):
